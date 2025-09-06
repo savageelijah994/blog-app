@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Train of Thought</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', serif;
+        }
+        body {
+            background: #f5f7f9;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .admin-header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .admin-nav {
+            background: #34495e;
+            padding: 0.5rem 2rem;
+            display: flex;
+            gap: 1.5rem;
+        }
+        .admin-nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .admin-nav a:hover, .admin-nav a.active {
+            background: #2c3e50;
+        }
+        .admin-container {
+            display: flex;
+            flex: 1;
+        }
+        .sidebar {
+            width: 250px;
+            background: #2c3e50;
+            color: white;
+            padding: 1.5rem 1rem;
+        }
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 1.5rem;
+        }
+        .sidebar-menu li {
+            margin-bottom: 0.8rem;
+        }
+        .sidebar-menu a {
+            color: #ecf0f1;
+            text-decoration: none;
+            display: block;
+            padding: 0.7rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: #34495e;
+        }
+        .sidebar-menu i {
+            margin-right: 0.7rem;
+            width: 20px;
+            text-align: center;
+        }
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            background: #f9f9f7;
+        }
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #eee;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 0.5rem 0;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: 'Georgia', serif;
+        }
+        textarea.form-control {
+            min-height: 200px;
+            resize: vertical;
+        }
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        .btn-primary {
+            background: #2c3e50;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1a252f;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+        .post-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .post-item:last-child {
+            border-bottom: none;
+        }
+        .post-info h3 {
+            margin-bottom: 0.3rem;
+            color: #2c3e50;
+        }
+        .post-meta {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .post-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 5rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .hidden {
+            display: none;
+        }
+        .notification {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            color: white;
+        }
+        .notification.success {
+            background: #2ecc71;
+        }
+        .notification.error {
+            background: #e74c3c;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .pagination button {
+            padding: 8px 15px;
+            background: #f1f1f1;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .pagination button.active {
+            background: #2c3e50;
+            color: white;
+        }
+        #image-preview {
+            margin-top: 10px;
+        }
+        #image-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 4px;
+        }
+
+
+.comment-moderation {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.moderation-comment {
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    background: #f9f9f9;
+}
+
+.moderation-comment.pending {
+    background: #fff3cd;
+    border-color: #ffeaa7;
+}
+
+.moderation-comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.moderation-comment-author {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.moderation-comment-date {
+    color: #7f8c8d;
+    font-size: 12px;
+}
+
+.moderation-comment-post {
+    color: #6c757d;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.moderation-comment-content {
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.moderation-comment-actions {
+    display: flex;
+    gap: 10px;
+}
+    </style>
+</head>
+<body>
+    <!-- Login Screen (Initially Visible) -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-header">
+            <h2>Train of Thought Admin</h2>
+            <p>Please enter your username to continue</p>
+        </div>
+        <div id="loginNotification" class="notification hidden"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+        </form>
+    </div>
+
+    <!-- Admin Dashboard (Initially Hidden) -->
+    <div id="adminDashboard" class="hidden">
+        <!-- Admin Header -->
+        <header class="admin-header">
+            <h1>Train of Thought - Admin Dashboard</h1>
+            <div class="user-menu">
+                <span>Hello, <span id="adminUsername">Admin</span></span>
+                <button class="btn btn-sm btn-danger" style="margin-left: 1rem;" id="logoutBtn">Logout</button>
+            </div>
+        </header>
+
+        <!-- Admin Navigation -->
+        <nav class="admin-nav">
+            <a href="#" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="#"><i class="fas fa-file-alt"></i> Posts</a>
+            <a href="#"><i class="fas fa-chart-bar"></i> Analytics</a>
+            <a href="#"><i class="fas fa-users"></i> Subscribers</a>
+            <a href="#"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+
+        <div class="admin-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <h3>Content Management</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#" class="active"><i class="fas fa-plus-circle"></i> Create New Post</a></li>
+                    <li><a href="#"><i class="fas fa-list"></i> All Posts</a></li>
+                    <li><a href="#"><i class="fas fa-folder"></i> Categories</a></li>
+                    <li><a href="#"><i class="fas fa-tags"></i> Tags</a></li>
+                </ul>
+
+                <h3>Media</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#"><i class="fas fa-image"></i> Images</a></li>
+                    <li><a href="#"><i class="fas fa-file-video"></i> Videos</a></li>
+                </ul>
+
+                <h3>Site Management</h3>
+                <ul class="sidebar-menu">
+                    <li><a href="#"><i class="fas fa-comments"></i> Comments</a></li>
+                    <li><a href="#"><i class="fas fa-user-friends"></i> Users</a></li>
+                    <li><a href="#"><i class="fas fa-plug"></i> Plugins</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="notification success hidden" id="notification">
+                    Post created successfully!
+                </div>    
+                    
+          <!-- Comments Management -->
+<div class="dashboard-card">
+    <div class="card-header">
+        <h2 class="section-title">Comments Moderation</h2>
+    </div>
+    <div class="comment-moderation" id="comment-moderation">
+        <p>Loading comments...</p>
+    </div>
+</div>
+                <!-- Stats Overview -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Posts</div>
+                        <div class="stat-number" id="totalPosts">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Views</div>
+                        <div class="stat-number" id="totalViews">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Subscribers</div>
+                        <div class="stat-number" id="totalSubscribers">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Comments</div>
+                        <div class="stat-number" id="totalComments">0</div>
+                    </div>
+                </div>
+
+                <!-- Create Post Form -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2 class="section-title">Create New Post</h2>
+                    </div>
+                    <form id="post-form">
+                        <div class="form-group">
+                            <label for="post-title">Post Title</label>
+                            <input type="text" id="post-title" class="form-control" placeholder="Enter post title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="post-content">Post Content</label>
+                            <textarea id="post-content" class="form-control" placeholder="Write your post content here..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="post-excerpt">Excerpt (Optional)</label>
+                            <textarea id="post-excerpt" class="form-control" placeholder="Short description of your post"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="cover-image">Cover Image</label>
+                            <input type="file" id="cover-image" class="form-control" accept="image/*">
+                            <div id="image-preview"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="post-category">Category</label>
+                            <select id="post-category" class="form-control">
+                                <option value="">Select a category</option>
+                                <option value="technology">Technology</option>
+                                <option value="lifestyle">Lifestyle</option>
+                                <option value="travel">Travel</option>
+                                <option value="food">Food</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="post-tags">Tags (comma separated)</label>
+                            <input type="text" id="post-tags" class="form-control" placeholder="e.g., tech, blog, web">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="comments-enabled" checked> Enable Comments
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="publish-now"> Publish Immediately
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Post</button>
+                        <button type="button" class="btn" id="saveDraftBtn">Save Draft</button>
+                    </form>
+                </div>
+
+                <!-- Recent Posts -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h2 class="section-title">Recent Posts</h2>
+                    </div>
+                    <div class="post-list" id="postList">
+                        <p>Loading posts...</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL
+        const API_BASE = 'http://localhost:3001';
+        let authToken = null;
+
+        // DOM Elements
+        const loginScreen = document.getElementById('loginScreen');
+        const adminDashboard = document.getElementById('adminDashboard');
+        const loginForm = document.getElementById('loginForm');
+        const loginNotification = document.getElementById('loginNotification');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const postForm = document.getElementById('post-form');
+        const notification = document.getElementById('notification');
+        const postList = document.getElementById('postList');
+        const imageInput = document.getElementById('cover-image');
+        const saveDraftBtn = document.getElementById('saveDraftBtn');
+        const adminUsername = document.getElementById('adminUsername');
+
+        // Check if user is already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedToken = localStorage.getItem('authToken');
+            const savedUsername = localStorage.getItem('username');
+            
+            if (savedToken && savedUsername) {
+                authToken = savedToken;
+                adminUsername.textContent = savedUsername;
+                showAdminDashboard();
+                loadStats();
+                loadPosts();
+            }
+
+            // Setup image preview
+            setupImagePreview();
+        });
+
+        // Image preview functionality
+        function setupImagePreview() {
+            const imageInput = document.getElementById('cover-image');
+            const imagePreview = document.getElementById('image-preview');
+            
+            if (imageInput) {
+                imageInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            imagePreview.innerHTML = `
+                                <img src="${e.target.result}" style="max-width: 100%; max-height: 200px; border-radius: 4px;">
+                                <p style="font-size: 12px; margin-top: 5px;">Image Preview</p>
+                            `;
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        imagePreview.innerHTML = '';
+                    }
+                });
+            }
+        }
+
+        // Handle login form submission
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.token) {
+                    authToken = data.token;
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('username', username);
+                    adminUsername.textContent = username;
+                    showAdminDashboard();
+                    loadStats();
+                    loadPosts();
+                } else {
+                    showNotification(loginNotification, data.error || 'Login failed', 'error');
+                }
+            } catch (error) {
+                showNotification(loginNotification, 'Login error. Please try again.', 'error');
+            }
+        });
+
+        // Handle logout
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('username');
+            authToken = null;
+            showLoginScreen();
+        });
+
+        // Handle post form submission
+        postForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!authToken) {
+                showNotification(notification, 'Please login first', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('post-title').value);
+            formData.append('content', document.getElementById('post-content').value);
+            formData.append('excerpt', document.getElementById('post-excerpt').value);
+            formData.append('category', document.getElementById('post-category').value);
+            formData.append('tags', document.getElementById('post-tags').value);
+            formData.append('commentsEnabled', document.getElementById('comments-enabled').checked);
+            formData.append('published', document.getElementById('publish-now').checked);
+            
+            const imageFile = document.getElementById('cover-image').files[0];
+            if (imageFile) {
+                formData.append('coverImage', imageFile);
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/posts`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showNotification(notification, 'Post created successfully!', 'success');
+                    postForm.reset();
+                    document.getElementById('image-preview').innerHTML = '';
+                    loadPosts();
+                    loadStats();
+                } else {
+                    showNotification(notification, 'Failed to create post', 'error');
+                }
+            } catch (error) {
+                showNotification(notification, 'Error creating post. Please try again.', 'error');
+            }
+        });
+
+        // Save as draft
+        saveDraftBtn.addEventListener('click', async function() {
+            if (!authToken) {
+                showNotification(notification, 'Please login first', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('post-title').value);
+            formData.append('content', document.getElementById('post-content').value);
+            formData.append('excerpt', document.getElementById('post-excerpt').value);
+            formData.append('category', document.getElementById('post-category').value);
+            formData.append('tags', document.getElementById('post-tags').value);
+            formData.append('commentsEnabled', document.getElementById('comments-enabled').checked);
+            formData.append('published', 'false'); // Save as draft
+            
+            const imageFile = document.getElementById('cover-image').files[0];
+            if (imageFile) {
+                formData.append('coverImage', imageFile);
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/posts`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    showNotification(notification, 'Draft saved successfully!', 'success');
+                    postForm.reset();
+                    document.getElementById('image-preview').innerHTML = '';
+                    loadPosts();
+                } else {
+                    showNotification(notification, 'Failed to save draft', 'error');
+                }
+            } catch (error) {
+                showNotification(notification, 'Error saving draft. Please try again.', 'error');
+            }
+        });
+
+        // Load stats
+        async function loadStats() {
+            if (!authToken) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const stats = await response.json();
+                    document.getElementById('totalPosts').textContent = stats.totalPosts || 0;
+                    document.getElementById('totalViews').textContent = stats.totalViews || 0;
+                    document.getElementById('totalSubscribers').textContent = stats.totalSubscribers || 0;
+                    document.getElementById('totalComments').textContent = stats.totalComments || 0;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load posts
+        async function loadPosts() {
+            if (!authToken) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/posts?admin=true`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    displayPosts(data.posts);
+                } else {
+                    postList.innerHTML = '<p>Error loading posts</p>';
+                }
+            } catch (error) {
+                postList.innerHTML = '<p>Error loading posts</p>';
+                console.error('Error loading posts:', error);
+            }
+        }
+
+        // Display posts
+        function displayPosts(posts) {
+            if (!posts || posts.length === 0) {
+                postList.innerHTML = '<p>No posts yet. Create your first post!</p>';
+                return;
+            }
+            
+            postList.innerHTML = '';
+            posts.forEach(post => {
+                const postItem = document.createElement('div');
+                postItem.classList.add('post-item');
+                postItem.innerHTML = `
+                    <div class="post-info">
+                        <h3>${post.title} ${!post.published ? '(Draft)' : ''}</h3>
+                        <div class="post-meta">
+                            ${new Date(post.createdAt).toLocaleDateString()} | 
+                            Views: ${post.views || 0} | 
+                            Comments: ${post.comments || 0}
+                        </div>
+                    </div>
+                    <div class="post-actions">
+                        <button class="btn btn-sm" onclick="editPost('${post.id}')">Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deletePost('${post.id}')">Delete</button>
+                    </div>
+                `;
+                postList.appendChild(postItem);
+            });
+        }
+
+        // Delete post
+        async function deletePost(id) {
+            if (!authToken || !confirm('Are you sure you want to delete this post?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/posts/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showNotification(notification, 'Post deleted successfully', 'success');
+                    loadPosts();
+                    loadStats();
+                } else {
+                    showNotification(notification, 'Failed to delete post', 'error');
+                }
+            } catch (error) {
+                showNotification(notification, 'Error deleting post', 'error');
+            }
+        }
+
+        // Edit post
+        async function editPost(id) {
+            showNotification(notification, 'Edit functionality would open here', 'success');
+            // In a real implementation, this would open an edit form
+        }
+
+        // Show notification
+        function showNotification(element, message, type) {
+            element.textContent = message;
+            element.classList.remove('hidden', 'success', 'error');
+            element.classList.add(type);
+            setTimeout(() => {
+                element.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Show admin dashboard
+        function showAdminDashboard() {
+            loginScreen.classList.add('hidden');
+            adminDashboard.classList.remove('hidden');
+        }
+
+        // Show login screen
+        function showLoginScreen() {
+            adminDashboard.classList.add('hidden');
+            loginScreen.classList.remove('hidden');
+        }
+
+        // Make functions global for HTML onclick attributes
+        window.deletePost = deletePost;
+        window.editPost = editPost;
+// Edit post function
+async function editPost(id) {
+    try {
+        const response = await fetch(`${API_BASE}/api/posts/${id}`);
+        const post = await response.json();
+        
+        // Fill the form with post data
+        document.getElementById('post-title').value = post.title;
+        document.getElementById('post-content').value = post.content;
+        document.getElementById('post-excerpt').value = post.excerpt || '';
+        document.getElementById('post-category').value = post.category || '';
+        document.getElementById('post-tags').value = Array.isArray(post.tags) ? post.tags.join(', ') : post.tags;
+        document.getElementById('comments-enabled').checked = post.commentsEnabled;
+        document.getElementById('publish-now').checked = post.published;
+        
+        // Show image preview if exists
+        if (post.coverImage) {
+            document.getElementById('image-preview').innerHTML = `
+                <img src="${API_BASE}${post.coverImage}" style="max-width: 100%; max-height: 200px; border-radius: 4px;">
+                <p style="font-size: 12px; margin-top: 5px;">Current Image</p>
+            `;
+        }
+        
+        // Change form to update mode
+        const submitBtn = document.querySelector('#post-form button[type="submit"]');
+        submitBtn.textContent = 'Update Post';
+        submitBtn.onclick = async function(e) {
+            e.preventDefault();
+            await updatePost(id);
+        };
+        
+        showNotification(notification, 'Edit mode: Fill the form and click Update Post', 'success');
+        
+    } catch (error) {
+        console.error('Error loading post for edit:', error);
+        showNotification(notification, 'Error loading post for editing', 'error');
+    }
+}
+
+// Update post function
+async function updatePost(id) {
+    if (!authToken) {
+        showNotification(notification, 'Please login first', 'error');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('title', document.getElementById('post-title').value);
+    formData.append('content', document.getElementById('post-content').value);
+    formData.append('excerpt', document.getElementById('post-excerpt').value);
+    formData.append('category', document.getElementById('post-category').value);
+    formData.append('tags', document.getElementById('post-tags').value);
+    formData.append('commentsEnabled', document.getElementById('comments-enabled').checked);
+    formData.append('published', document.getElementById('publish-now').checked);
+    
+    const imageFile = document.getElementById('cover-image').files[0];
+    if (imageFile) {
+        formData.append('coverImage', imageFile);
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/posts/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: formData
+        });
+        
+        if (response.ok) {
+            showNotification(notification, 'Post updated successfully!', 'success');
+            resetForm();
+            loadPosts();
+        } else {
+            showNotification(notification, 'Failed to update post', 'error');
+        }
+    } catch (error) {
+        showNotification(notification, 'Error updating post', 'error');
+    }
+}
+
+// Reset form function
+function resetForm() {
+    document.getElementById('post-form').reset();
+    document.getElementById('image-preview').innerHTML = '';
+    const submitBtn = document.querySelector('#post-form button[type="submit"]');
+    submitBtn.textContent = 'Create Post';
+    submitBtn.onclick = null;
+}    
+
+// Load comments for moderation
+async function loadComments() {
+    if (!authToken) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/comments`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        
+        if (response.ok) {
+            const comments = await response.json();
+            displayComments(comments);
+        }
+    } catch (error) {
+        console.error('Error loading comments:', error);
+    }
+}
+
+// Display comments for moderation
+function displayComments(comments) {
+    const container = document.getElementById('comment-moderation');
+    
+    if (comments.length === 0) {
+        container.innerHTML = '<p>No comments to moderate.</p>';
+        return;
+    }
+    
+    container.innerHTML = comments.map(comment => `
+        <div class="moderation-comment ${comment.approved ? '' : 'pending'}">
+            <div class="moderation-comment-header">
+                <span class="moderation-comment-author">${comment.author}</span>
+                <span class="moderation-comment-date">${new Date(comment.createdAt).toLocaleDateString()}</span>
+            </div>
+            <div class="moderation-comment-post">
+                On Post ID: ${comment.postId}
+            </div>
+            <div class="moderation-comment-content">${comment.content}</div>
+            <div class="moderation-comment-actions">
+                ${!comment.approved ? `
+                    <button class="btn btn-sm btn-primary" onclick="approveComment(${comment.id})">Approve</button>
+                ` : ''}
+                <button class="btn btn-sm btn-danger" onclick="deleteComment(${comment.id})">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Approve comment
+async function approveComment(commentId) {
+    if (!authToken) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/comments/${commentId}/approve`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        
+        if (response.ok) {
+            showNotification(notification, 'Comment approved', 'success');
+            loadComments();
+        }
+    } catch (error) {
+        showNotification(notification, 'Error approving comment', 'error');
+    }
+}
+
+// Delete comment
+async function deleteComment(commentId) {
+    if (!authToken || !confirm('Are you sure you want to delete this comment?')) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/comments/${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        
+        if (response.ok) {
+            showNotification(notification, 'Comment deleted', 'success');
+            loadComments();
+        }
+    } catch (error) {
+        showNotification(notification, 'Error deleting comment', 'error');
+    }
+}
+
+// Add to global functions
+window.approveComment = approveComment;
+window.deleteComment = deleteComment;
+
+// Call loadComments when dashboard loads
+// Add this to your showAdminDashboard function:
+function showAdminDashboard() {
+    loginScreen.classList.add('hidden');
+    adminDashboard.classList.remove('hidden');
+    loadStats();
+    loadPosts();
+    loadComments(); // Add this line
+}
+
+    </script>
+</body>
+</html>
